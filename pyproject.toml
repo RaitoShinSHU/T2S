@@ -1,0 +1,17 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "t2s"
+version = "0.1.0"
+description = "TB2J exchange.out to Sunny.jl input generator"
+readme = "README.md"
+requires-python = ">=3.8"
+dependencies = []
+
+[project.scripts]
+t2s = "t2s.cli:entrypoint"
+
+[tool.setuptools]
+packages = ["t2s", "t2s.core", "t2s.generators"]
