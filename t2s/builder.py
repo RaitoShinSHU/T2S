@@ -1,4 +1,4 @@
-from typing import List
+from typing import List, Optional
 from .core.soc_detector import detect_soc
 from .generators.lattice_generator import make_sunny_latvecs_block
 from .generators.atom_generator import make_sunny_atoms_block
@@ -15,7 +15,8 @@ def build_sunny_julia(exchange_path: str,
                       max_dist: float = 0.0,
                       min_exchange: float = 1e-3,
                       with_dipole: bool = False,
-                      with_relax: bool = False) -> str:
+                      with_relax: bool = False,
+                      spins: Optional[List[str]] = None) -> str:
     if soc_mode == "soc":
         is_soc = True
     elif soc_mode == "no-soc":
@@ -34,13 +35,17 @@ def build_sunny_julia(exchange_path: str,
         "",
         make_sunny_latvecs_block(exchange_path),
         "",
-        make_sunny_atoms_block(exchange_path, mag_threshold=mag_threshold, is_soc=is_soc),
+        make_sunny_atoms_block(exchange_path,
+                               mag_threshold=mag_threshold,
+                               is_soc=is_soc,
+                               spins=spins),
         "",
         make_sunny_exchange_block(exchange_path,
                                   mag_threshold=mag_threshold,
                                   j_tol=j_tol, d_tol=d_tol, dist_tol=dist_tol,
                                   max_dist=max_dist, min_exchange=min_exchange,
-                                  use_dmi=is_soc),
+                                  use_dmi=is_soc,
+                                  spins=spins),
     ]
 
     if with_dipole:
