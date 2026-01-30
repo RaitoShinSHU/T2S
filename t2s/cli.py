@@ -1,6 +1,23 @@
 import argparse
 from pathlib import Path
 from .builder import build_sunny_julia
+ALLOWED_SPINS = {"1/2", "1", "3/2", "2", "2/5", "3", "2/7"}
+
+def parse_spins(spin_args):
+    if not spin_args:
+        return None
+    spins = []
+    for raw in spin_args:
+        for part in raw.split(","):
+            value = part.strip()
+            if not value:
+                continue
+            if value not in ALLOWED_SPINS:
+                raise ValueError(
+                    f"Unsupported S: {value}. Allow for: {', '.join(sorted(ALLOWED_SPINS))}."
+                )
+            spins.append(value)
+    return spins
 
 def main():
     parser = argparse.ArgumentParser()
@@ -19,6 +36,11 @@ def main():
 
     parser.add_argument("--with-dipole", action="store_true")
     parser.add_argument("--with-relax", action="store_true")
+    parser.add_argument(
+        "--spin",
+        action="append",
+        help="为每个磁性原子指定 S (可重复或逗号分隔). 允许值: 1/2, 1, 3/2, 2, 2/5, 3, 2/7",
+    )
 
     args = parser.parse_args()
 
@@ -36,18 +58,24 @@ def main():
     else:
         soc_mode = "auto"
 
-    code = build_sunny_julia(
-        exchange_path=args.exchange,
-        soc_mode=soc_mode,
-        mag_threshold=args.mag_threshold,
-        j_tol=args.j_tol,
-        d_tol=args.d_tol,
-        dist_tol=args.dist_tol,
-        max_dist=args.max_dist,
-        min_exchange=args.min_exchange,
-        with_dipole=args.with_dipole,
-        with_relax=args.with_relax,
-    )
+    try:
+        spins = parse_spins(args.spin)
+        code = build_sunny_julia(
+            exchange_path=args.exchange,
+            soc_mode=soc_mode,
+            mag_threshold=args.mag_threshold,
+            j_tol=args.j_tol,
+            d_tol=args.d_tol,
+            dist_tol=args.dist_tol,
+            max_dist=args.max_dist,
+            min_exchange=args.min_exchange,
+            with_dipole=args.with_dipole,
+            with_relax=args.with_relax,
+            spins=spins,
+        )
+    except ValueError as exc:
+        print(f"[ERROR] {exc}", file=sys.stderr)
+        sys.exit(1)
 
     if args.output:
         Path(args.output).write_text(code, encoding="utf-8")
