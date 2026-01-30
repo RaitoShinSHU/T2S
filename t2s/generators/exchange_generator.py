@@ -78,11 +78,13 @@ def make_sunny_exchange_block(exchange_path: str,
                     ux, uy, uz = Dx/D, Dy/D, Dz/D
                 else:
                     ux, uy, uz = 0.0, 0.0, 0.0
-                term = f"{scale:.6f} * {t['_j_name']} * I"
                 if use_dmi and D > min_exchange:
+                    term = f"{scale:.6f} * {t['_j_name']} * I"
                     term += (
                         f" + {scale:.6f} * {t['_d_name']} * dmvec([{ux:.6f}, {uy:.6f}, {uz:.6f}])"
                     )
+                else:
+                    term = f"{scale:.6f} * {t['_j_name']}"
                 out.append(
                     f"set_exchange!(sys, {term}, Bond({i}, {j}, [{b['R'][0]}, {b['R'][1]}, {b['R'][2]}]))"
                 )
