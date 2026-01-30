@@ -1,6 +1,7 @@
 import argparse
 from pathlib import Path
 from .builder import build_sunny_julia
+
 ALLOWED_SPINS = {"1/2", "1", "3/2", "2", "2/5", "3", "2/7"}
 
 def parse_spins(spin_args):
@@ -14,7 +15,7 @@ def parse_spins(spin_args):
                 continue
             if value not in ALLOWED_SPINS:
                 raise ValueError(
-                    f"Unsupported S: {value}. Allow for: {', '.join(sorted(ALLOWED_SPINS))}."
+                    f"不支持的 S 值: {value}. 允许的值: {', '.join(sorted(ALLOWED_SPINS))}."
                 )
             spins.append(value)
     return spins
